@@ -1,4 +1,4 @@
-import { Home, Users, Pill, Truck, Bot, TrendingUp } from 'lucide-react';
+import { Home, Users, Pill, Truck, Bot, TrendingUp, Stethoscope, BarChart3 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
 interface NavigationProps {
@@ -10,9 +10,10 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const tabs = [
     { id: 'dashboard', label: 'Ana Sayfa', icon: Home },
     { id: 'clients', label: 'Müşteriler', icon: Users },
-    { id: 'medications', label: 'İlaçlar', icon: Pill },
+    { id: 'animals', label: 'Hayvanlar', icon: Stethoscope },
     { id: 'visits', label: 'Ziyaretler', icon: Truck },
-    { id: 'income', label: 'Gelir', icon: TrendingUp },
+    { id: 'medications', label: 'İlaçlar', icon: Pill },
+    { id: 'financial', label: 'Mali', icon: BarChart3 },
     { id: 'assistant', label: 'Asistan', icon: Bot },
   ];
 
@@ -63,7 +64,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-xl border-t border-border/50 px-2 py-2 z-50 safe-area-pb">
         <ul className="flex justify-around">
-          {tabs.slice(0, 5).map(tab => {
+          {tabs.slice(0, 6).map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
@@ -71,8 +72,8 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
                 <button
                   onClick={() => onTabChange(tab.id)}
                   className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-200 ${
-                    isActive 
-                      ? 'text-primary' 
+                    isActive
+                      ? 'text-primary'
                       : 'text-muted-foreground'
                   }`}
                 >

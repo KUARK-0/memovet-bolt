@@ -1,109 +1,81 @@
-import { useState, useEffect } from 'react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import { Client, Medication, Visit } from '../types';
-import Navigation from '../components/Navigation';
-import Dashboard from '../components/Dashboard';
-import ClientsPanel from '../components/ClientsPanel';
-import MedicationsPanel from '../components/MedicationsPanel';
-import VisitsPanel from '../components/VisitsPanel';
-import IncomePanel from '../components/IncomePanel';
-import AIAssistant from '../components/AIAssistant';
-import ThemeToggle from '../components/ThemeToggle';
-
-const generateId = () => Math.random().toString(36).substring(2, 9);
+import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import Navigation from "@/components/Navigation";
+import Dashboard from "@/components/Dashboard";
+import ClientsPanel from "@/components/ClientsPanel";
+import AnimalsPanel from "@/components/AnimalsPanel";
+import AdvancedVisitsPanel from "@/components/AdvancedVisitsPanel";
+import AdvancedMedicationsPanel from "@/components/AdvancedMedicationsPanel";
+import FinancialManagementPanel from "@/components/FinancialManagementPanel";
+import AIAssistant from "@/components/AIAssistant";
+import ThemeToggle from "@/components/ThemeToggle";
+import { Button } from "@/components/ui/button";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [clients, setClients] = useLocalStorage<Client[]>('memovet-clients', []);
-  const [medications, setMedications] = useLocalStorage<Medication[]>('memovet-medications', []);
-  const [visits, setVisits] = useLocalStorage<Visit[]>('memovet-visits', []);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const addClient = (client: Omit<Client, 'id'>) => {
-    setClients(prev => [...prev, { ...client, id: generateId() }]);
-  };
-
-  const updateClient = (id: string, updates: Partial<Client>) => {
-    setClients(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
-  };
-
-  const deleteClient = (id: string) => {
-    setClients(prev => prev.filter(c => c.id !== id));
-  };
-
-  const addMedication = (medication: Omit<Medication, 'id'>) => {
-    setMedications(prev => [...prev, { ...medication, id: generateId() }]);
-  };
-
-  const updateMedication = (id: string, updates: Partial<Medication>) => {
-    setMedications(prev => prev.map(m => m.id === id ? { ...m, ...updates } : m));
-  };
-
-  const deleteMedication = (id: string) => {
-    setMedications(prev => prev.filter(m => m.id !== id));
-  };
-
-  const addVisit = (visit: Omit<Visit, 'id'>) => {
-    setVisits(prev => [{ ...visit, id: generateId() }, ...prev]);
-  };
-
-  const deleteVisit = (id: string) => {
-    setVisits(prev => prev.filter(v => v.id !== id));
-  };
+  const { isAuthenticated, loading, error, signOut } = useAuth();
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'clients':
-        return (
-          <ClientsPanel
-            clients={clients}
-            onAdd={addClient}
-            onUpdate={updateClient}
-            onDelete={deleteClient}
-          />
-        );
-      case 'medications':
-        return (
-          <MedicationsPanel
-            medications={medications}
-            onAdd={addMedication}
-            onUpdate={updateMedication}
-            onDelete={deleteMedication}
-          />
-        );
-      case 'visits':
-        return (
-          <VisitsPanel
-            visits={visits}
-            clients={clients}
-            onAdd={addVisit}
-            onDelete={deleteVisit}
-          />
-        );
-      case 'income':
-        return <IncomePanel visits={visits} />;
-      case 'assistant':
+      case "clients":
+        return <ClientsPanel />;
+      case "animals":
+        return <AnimalsPanel />;
+      case "visits":
+        return <AdvancedVisitsPanel />;
+      case "medications":
+        return <AdvancedMedicationsPanel />;
+      case "financial":
+        return <FinancialManagementPanel />;
+      case "assistant":
         return <AIAssistant />;
       default:
-        return (
-          <Dashboard
-            medications={medications}
-            clients={clients}
-            visits={visits}
-            onNavigate={setActiveTab}
-          />
-        );
+        return <Dashboard onNavigate={setActiveTab} />;
     }
   };
 
-  if (!mounted) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="max-w-md w-full space-y-4">
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold">Büyükbaş Veteriner</h1>
+            <p className="text-muted-foreground">Sistemine Hoşgeldiniz</p>
+          </div>
+
+          {error && (
+            <Alert className="border-red-200 bg-red-50">
+              <AlertCircle className="h-4 w-4 text-red-600" />
+              <AlertDescription className="text-red-800">
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <div className="bg-muted p-6 rounded-lg text-center text-sm text
+-muted-foreground">
+            <p>Lütfen Supabase üzerinden oturum açın veya kaydolun.</p>
+            <p className="mt-2">Demo hesabı kullanabilirsiniz.</p>
+          </div>
+
+          <Button
+            onClick={() => signOut()}
+            variant="outline"
+            className="w-full"
+          >
+            Oturum Aç / Kaydol
+          </Button>
+        </div>
       </div>
     );
   }
@@ -112,10 +84,17 @@ const Index = () => {
     <div className="min-h-screen bg-background flex w-full">
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
       <main className="flex-1 p-4 md:p-8 pb-28 md:pb-8 overflow-x-hidden">
-        <div className="md:hidden flex justify-end mb-4">
+        <div className="md:hidden flex justify-end mb-4 gap-2">
           <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => signOut()}
+          >
+            Çıkış Yap
+          </Button>
         </div>
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {renderContent()}
         </div>
       </main>
