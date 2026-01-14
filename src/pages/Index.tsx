@@ -9,12 +9,11 @@ import AdvancedMedicationsPanel from "@/components/AdvancedMedicationsPanel";
 import FinancialManagementPanel from "@/components/FinancialManagementPanel";
 import AIAssistant from "@/components/AIAssistant";
 import ThemeToggle from "@/components/ThemeToggle";
+import Auth from "./Auth";
 import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Index = () => {
-  const { isAuthenticated, loading, error, signOut } = useAuth();
+  const { isAuthenticated, loading, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const renderContent = () => {
@@ -45,39 +44,7 @@ const Index = () => {
   }
 
   if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="max-w-md w-full space-y-4">
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold">Büyükbaş Veteriner</h1>
-            <p className="text-muted-foreground">Sistemine Hoşgeldiniz</p>
-          </div>
-
-          {error && (
-            <Alert className="border-red-200 bg-red-50">
-              <AlertCircle className="h-4 w-4 text-red-600" />
-              <AlertDescription className="text-red-800">
-                {error}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          <div className="bg-muted p-6 rounded-lg text-center text-sm text
--muted-foreground">
-            <p>Lütfen Supabase üzerinden oturum açın veya kaydolun.</p>
-            <p className="mt-2">Demo hesabı kullanabilirsiniz.</p>
-          </div>
-
-          <Button
-            onClick={() => signOut()}
-            variant="outline"
-            className="w-full"
-          >
-            Oturum Aç / Kaydol
-          </Button>
-        </div>
-      </div>
-    );
+    return <Auth />;
   }
 
   return (
